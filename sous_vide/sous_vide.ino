@@ -23,6 +23,9 @@
 // So we can save and retrieve settings
 #include <EEPROM.h>
 
+// Timer for 32u4
+#include <TimerOne.h>
+
 // ************************************************
 // Pin definitions
 // ************************************************
@@ -180,18 +183,14 @@ void setup()
    myPID.SetSampleTime(1000);
    myPID.SetOutputLimits(0, WindowSize);
 
-  // Run timer2 interrupt every 15 ms 
-  TCCR2A = 0;
-  TCCR2B = 1<<CS22 | 1<<CS21 | 1<<CS20;
-
-  //Timer2 Overflow Interrupt Enable
-  TIMSK2 |= 1<<TOIE2;
-}
+   Timer1.initialize(15000);
+   Timer1.attachInterrupt(TimerInterrupt);
+ }
 
 // ************************************************
 // Timer Interrupt Handler
 // ************************************************
-SIGNAL(TIMER2_OVF_vect) 
+void TimerInterrupt() 
 {
   if (opState == OFF)
   {
